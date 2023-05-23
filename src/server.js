@@ -1,26 +1,42 @@
 import express from "express";
-
-let articlesInfo = [
-    {
-        name: 'learn-react',
-        upvotes: 0,
-        comments: [],
-    },
-    {
-        name: 'learn-node',
-        upvotes: 0,
-        comments: [],
-    },
-    {
-        name: 'mongodb',
-        upvotes: 0,
-        comments: [],
-    },
-]
+import { MongoClient } from "mongodb";
+// let articlesInfo = [
+//     {
+//         name: 'learn-react',
+//         upvotes: 0,
+//         comments: [],
+//     },
+//     {
+//         name: 'learn-node',
+//         upvotes: 0,
+//         comments: [],
+//     },
+//     {
+//         name: 'mongodb',
+//         upvotes: 0,
+//         comments: [],
+//     },
+// ]
 
 const listeningPort = 8000;
 
 const app = express();
+
+app.get('/api/articles/:name', async (req, res) => {
+    const {name} = req.params;
+    const client = new MongoClient('mongodb://127.0.0.1:27017');
+
+    await client.connect();
+
+    const db = client.db('react-blog-db');
+    const article = await db.collection('articles').findOne({name})
+
+    if (article) {
+        res.json(article);
+    } else {
+        res.status(404).send(`The '${name}' article was not found.`)
+    }
+});
 
 app.use(express.json()); // Middleware!
 
