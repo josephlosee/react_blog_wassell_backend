@@ -44,8 +44,7 @@ app.post('/api/articles/:name/comments', async (req, res) => {
     const article = await db.collection('articles').findOne({name})
 
     if (article) {
-        // article.comments.push({postedBy, text});
-        res.send(`The ${name} article now has a comment starting with "${text.substring(0,10)}..." by ${postedBy}.`)
+        res.json(article);
     } else {
         res.send(`That article doesn't exist!`);
     }
