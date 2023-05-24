@@ -27,7 +27,7 @@ app.put('/api/articles/:name/upvote', async (req, res) => {
     
     
     if (article) {
-        res.send(`The ${name} article now has ${article.upvotes}  upvotes.`);
+        res.json(article);
     } else {
         res.send(`That article doesn't exist!`);
     }
