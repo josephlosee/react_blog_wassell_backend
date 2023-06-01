@@ -1,8 +1,14 @@
 import fs from 'fs';
+import path from 'path';
 import admin from 'firebase-admin';
 import express, { Request } from "express";
 import { db, connectToDb } from "./db";
-import { DecodedIdToken } from 'firebase-admin/lib/auth/token-verifier';
+import { DecodedIdToken } from 'firebase-admin/auth';
+
+import * as url from 'url';
+
+const __fileName = url.fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 interface MyBlogRequest extends Request {
     user?: DecodedIdToken
@@ -18,6 +24,7 @@ admin.initializeApp({credential: admin.credential.cert(credentials)});
 const app = express();
 
 app.use(express.json()); // Middleware!
+app.use(express.static(path.join(__dirname, '../client')))
 
 app.use(async (req: MyBlogRequest, res, next) => {
     const {authtoken } = req.headers;
