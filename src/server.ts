@@ -92,8 +92,8 @@ app.post('/api/articles/:name/comments', async (req:MyBlogRequest, res) => {
     const { text } = req.body;
     const { email } = req.user!;
 
-
-    await db.collection('articles').updateOne({name}, {$push: {comments: {email, text}}}); 
+    // console.log(`Comment ${text} posted by ${email}`);gi
+    await db.collection('articles').updateOne({name}, {$push: {comments: {postedBy: email, text}}}); 
 
     const article = await db.collection('articles').findOne({name})
 
