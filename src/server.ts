@@ -2,13 +2,13 @@ import fs from 'fs';
 import path from 'path';
 import admin from 'firebase-admin';
 import express, { Request } from "express";
-import { db, connectToDb } from "./db";
 import { DecodedIdToken } from 'firebase-admin/auth';
+import url from 'url';
 
-import * as url from 'url';
+import { db, connectToDb } from "./db.js";
 
 const __fileName = url.fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = path.dirname(__fileName);
 
 interface MyBlogRequest extends Request {
     user?: DecodedIdToken

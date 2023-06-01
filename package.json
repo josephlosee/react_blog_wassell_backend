@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "description": "The backend Express.js server for the React Blog based on Shaun Wassell's LinkedIn Learning Course",
   "main": "dist/server.js",
-  "type": "commonjs",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npx tsc",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/server.js\"",
+    "start": "nodemon -q ./dist/server.js --es-module-specifier-resolution=node",
     "startdb": "mongod --dbpath ./mongodb-data "
   },
   "repository": {
