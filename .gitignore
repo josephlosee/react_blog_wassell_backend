@@ -112,6 +112,7 @@ dist
 dist-ssr
 mongodb-data
 *.local
+credentials.json
 
 # Editor directories and files
 .vscode/*
