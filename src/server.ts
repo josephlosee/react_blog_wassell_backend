@@ -32,33 +32,54 @@ app.use(async (req: MyBlogRequest, res, next) => {
     next(); 
 });
 
-app.get('/api/articles/:name', async (req, res) => {
+app.get('/api/articles/:name', async (req:MyBlogRequest, res) => {
     const {name} = req.params;
-    
+    const uid = req.user?.sub || '';
     const article = await db.collection('articles').findOne({name})
 
     if (article) {
         res.json(article);
+        const upvoteIds = article.upvoteIds || [];
+        article.canUpvote = uid && !upvoteIds.include(uid);
     } else {
         res.status(404).send(`The '${name}' article was not found.`)
     }
 });
 
+
+app.use((req: MyBlogRequest, res, next) => {
+    if(req.user) {
+        next();
+    } else {
+        res.sendStatus(401);
+    }
+})
+
 app.put('/api/articles/:name/upvote', async (req: MyBlogRequest, res) => {
     const {name} = req.params;
-    const {uid} = req.user;
-
-
-    await db.collection('articles').updateOne({name}, {$inc: {upvotes: 1}}); 
-    // I'm not familiar with mongodb so the query here is saying "find an article with this name, then increase ($inc) it's upvotes by 1"
-
+    const uid = req.user?.sub || '';
     const article = await db.collection('articles').findOne({name});
-    
-    
+
+
     if (article) {
         const upvoteIds = article.upvoteIds || [];
-        article.canUpvote = uid && !upvoteIds.include(uid);
-        res.json(article);
+        const canUpvote = uid && !upvoteIds.include(uid);
+
+        if (canUpvote){
+            await db.collection('articles').updateOne(
+                {name}, 
+                {
+                    $inc: {upvotes: 1}, 
+                    $push: {upvoteIds: uid}
+                }); 
+            // I'm not familiar with mongodb so the query here is saying "find an article with this name, then increase ($inc) it's upvotes by 1, and add the user id to the upvoteIds"
+        
+            const updatedArticle = await db.collection('articles').findOne({name});
+            res.json(updatedArticle);
+        } else {
+            res.sendStatus(400);
+        }
+        
     } else {
         res.send(`That article doesn't exist!`);
     }
@@ -66,11 +87,13 @@ app.put('/api/articles/:name/upvote', async (req: MyBlogRequest, res) => {
     
 });
 
-app.post('/api/articles/:name/comments', async (req, res) => {
+app.post('/api/articles/:name/comments', async (req:MyBlogRequest, res) => {
     const {name} = req.params;
-    const {postedBy, text} = req.body;
+    const { text } = req.body;
+    const { email } = req.user!;
 
-    await db.collection('articles').updateOne({name}, {$push: {comments: {postedBy, text}}}); 
+
+    await db.collection('articles').updateOne({name}, {$push: {comments: {email, text}}}); 
 
     const article = await db.collection('articles').findOne({name})
 
