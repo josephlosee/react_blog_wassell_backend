@@ -11,7 +11,7 @@ interface MyBlogRequest extends Request {
 const listeningPort = 8000;
 
 // const credentials = JSON.parse(fs.readFileSync('../credentials.json').to);
-const credentials = JSON.parse(fs.readFileSync('../credentials.json').toString());
+const credentials = JSON.parse(fs.readFileSync('./credentials.json').toString());
 
 admin.initializeApp({credential: admin.credential.cert(credentials)});
 
@@ -25,7 +25,7 @@ app.use(async (req: MyBlogRequest, res, next) => {
         try {
             req.user = await admin.auth().verifyIdToken(authtoken as string);
         } catch(e) {
-            res.sendStatus(400);
+            return res.sendStatus(400);
         }
         
     }   
@@ -40,7 +40,7 @@ app.get('/api/articles/:name', async (req:MyBlogRequest, res) => {
     if (article) {
         res.json(article);
         const upvoteIds = article.upvoteIds || [];
-        article.canUpvote = uid && !upvoteIds.include(uid);
+        article.canUpvote = uid && !upvoteIds.includes(uid);
     } else {
         res.status(404).send(`The '${name}' article was not found.`)
     }
@@ -63,7 +63,7 @@ app.put('/api/articles/:name/upvote', async (req: MyBlogRequest, res) => {
 
     if (article) {
         const upvoteIds = article.upvoteIds || [];
-        const canUpvote = uid && !upvoteIds.include(uid);
+        const canUpvote = uid && !upvoteIds.includes(uid);
 
         if (canUpvote){
             await db.collection('articles').updateOne(
