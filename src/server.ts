@@ -1,6 +1,14 @@
+import fs from 'fs';
+import admin from 'firebase-admin';
 import express from "express";
 import { db, connectToDb } from "./db";
+
 const listeningPort = 8000;
+
+// const credentials = JSON.parse(fs.readFileSync('../credentials.json').to);
+const credentials = JSON.parse(fs.readFileSync('../credentials.json').toString());
+
+admin.initializeApp({credential: admin.credential.cert(credentials)});
 
 const app = express();
 app.use(express.json()); // Middleware!
