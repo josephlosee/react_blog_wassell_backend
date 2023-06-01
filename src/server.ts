@@ -26,6 +26,10 @@ const app = express();
 app.use(express.json()); // Middleware!
 app.use(express.static(path.join(__dirname, '../client')))
 
+app.get(/^(?!\/api).+/, (req, res) => {
+    res.sendFile(path.join(__dirname, `../client/index.html`));
+})
+
 app.use(async (req: MyBlogRequest, res, next) => {
     const {authtoken } = req.headers;
     if (authtoken){

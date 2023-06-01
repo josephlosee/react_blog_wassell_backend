@@ -109,6 +109,7 @@ lerna-debug.log*
 
 node_modules
 dist
+client
 dist-ssr
 mongodb-data
 *.local
